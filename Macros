@@ -1,0 +1,24 @@
+Dim Coord_Selection As Boolean
+Sub Selection_On()
+    Coord_Selection = True
+End Sub
+Sub Selection_Off()
+    Coord_Selection = False
+End Sub
+Private Sub Workbook_SheetSelectionChange(ByVal Sh As Object, ByVal Target As Range)
+Dim WorkRange As Range, CrossRange As Range
+    Set WorkRange = Range("A1:XFD1048576")    'адрес рабочего диапазона с таблицей
+    If Target.Count > 1 Then Exit Sub
+    If Coord_Selection = False Then
+        WorkRange.FormatConditions.Delete
+        Exit Sub
+    End If
+    Application.ScreenUpdating = False
+    If Not Intersect(Target, WorkRange) Is Nothing Then
+        Set CrossRange = Intersect(WorkRange, Union(Target.EntireRow, Target.EntireColumn))
+        WorkRange.FormatConditions.Delete
+        CrossRange.FormatConditions.Add Type:=xlExpression, Formula1:="=1"
+        CrossRange.FormatConditions(1).Interior.Color = RGB(242, 242, 242) '.ColorIndex = 48
+        Target.FormatConditions.Delete
+    End If
+End Sub
